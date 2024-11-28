@@ -12,13 +12,13 @@
 
 ## 使用
 
-参考[学在吉大视频下载器/H5播放器](https://github.com/RikaCelery/StudyAtJlu)获得cookie
+用户名密码填入最上面的文本框，点击转圈圈的图标
 
-填入最上面的文本框，点击转圈圈的图标
+已开启CI构建，请到actions下载最新版本
 
 ## TODO（画大饼/pr is welcome）
 
-- [ ] 自动获取cookie(Selenium)
+- [X] ~~自动获取cookie(登录)~~
 - [ ] 播放器增加速度控制
 - [ ] 更好的播放器界面
 - [ ] 下载功能，在线观看功能，打开文件夹。。。。。。。。

@@ -4,7 +4,7 @@ import kotlinx.serialization.json.*
 
 class JsonElementCastException(msg: String) : Exception(msg)
 
-@Suppress("FunctionName","unused")
+@Suppress("FunctionName", "unused")
 fun JsonElement.Object(key: String): JsonObject {
     val obj = this as? JsonObject ?: throw JsonElementCastException("Cannot cast to JsonObject")
     if (!obj.containsKey(key)) {
@@ -16,8 +16,7 @@ fun JsonElement.Object(key: String): JsonObject {
     }
     return value
 }
-
-@Suppress("FunctionName","unused")
+@Suppress("FunctionName", "unused")
 fun JsonElement.Array(key: String): JsonArray {
     val obj = this as? JsonObject ?: throw JsonElementCastException("Cannot cast to JsonObject")
     if (!obj.containsKey(key)) {
@@ -29,7 +28,8 @@ fun JsonElement.Array(key: String): JsonArray {
     }
     return value
 }
-@Suppress("FunctionName","unused")
+
+@Suppress("FunctionName", "unused")
 fun JsonElement.ObjectArray(key: String): List<JsonObject> {
     val obj = this as? JsonObject ?: throw JsonElementCastException("Cannot cast to JsonObject")
     if (!obj.containsKey(key)) {
@@ -44,6 +44,19 @@ fun JsonElement.ObjectArray(key: String): List<JsonObject> {
 
     return value.map { it as JsonObject }
 }
+
+@Suppress("unused")
+val JsonElement.objectArray: List<JsonObject>
+    get() {
+        val value = this
+        if (value !is JsonArray) {
+            throw JsonElementCastException("This is not a JsonArray, this '$value'")
+        }
+        if (!value.all { it is JsonObject })
+            throw JsonElementCastException("Values of this array are not all JsonObject, this '$value'")
+
+        return value.map { it as JsonObject }
+    }
 
 @Suppress("unused")
 fun JsonElement.String(key: String): String {
@@ -136,5 +149,22 @@ fun JsonElement.Double(key: String): Double {
     }
     val value = jsonPrimitive.doubleOrNull
         ?: throw JsonElementCastException("Value of key '$key' is not a Double, value '${obj.getValue(key)}'")
+    return value
+}
+
+
+@Suppress("FunctionName", "unused")
+fun JsonElement.Boolean(key: String): Boolean {
+    val obj = this as? JsonObject ?: throw JsonElementCastException("Cannot cast to JsonObject")
+    if (!obj.containsKey(key)) {
+        throw JsonElementCastException("Key '$key' not found")
+    }
+    val jsonPrimitive = try {
+        obj.getValue(key).jsonPrimitive
+    } catch (_: IllegalArgumentException) {
+        throw JsonElementCastException("Value of key '$key' is not a JsonPrimitive, value '${obj.getValue(key)}'")
+    }
+    val value = jsonPrimitive.booleanOrNull
+        ?: throw JsonElementCastException("Value of key '$key' is not a Boolean, value '${obj.getValue(key)}'")
     return value
 }
