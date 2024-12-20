@@ -29,6 +29,7 @@ import utils.OkHttpUtil
 import utils.fillDefaults
 import utils.matches
 import java.io.File
+import java.io.OutputStream
 import java.io.PrintStream
 import java.util.concurrent.atomic.AtomicLong
 import kotlin.math.min
@@ -73,8 +74,10 @@ object CCookiesStorage : CookiesStorage {
         with(cookie) {
             if (name.isBlank()) return@withLock
         }
-        println("[COOKIE-SET]\n" +
-                "    "+cookie.name + "=" + cookie.value + " for " + requestUrl)
+        println(
+            "[COOKIE-SET]\n" +
+                    "    " + cookie.name + "=" + cookie.value + " for " + requestUrl
+        )
         container.removeAll { it.name == cookie.name && it.matches(requestUrl) }
         container.add(cookie.fillDefaults(requestUrl))
         cookie.expires?.timestamp?.let { expires ->
@@ -184,13 +187,21 @@ fun logOut() {
     logFile.appendText("\n")
 }
 
+class MergeStream(vararg val streams: OutputStream) : OutputStream() {
+
+    override fun write(b: kotlin.Int) {
+        streams.forEach { it.write(b) }
+    }
+
+}
+
 fun main() {
     val outErr = File("err.txt").outputStream()
-    val err = PrintStream(outErr)
+    val err = PrintStream(MergeStream(outErr,System.err))
     val outOut = File("out.txt").outputStream()
-    val out = PrintStream(outOut)
-//    System.setErr(err)
-//    System.setErr(out)
+    val out = PrintStream(MergeStream(outOut,System.out))
+    System.setErr(err)
+    System.setErr(out)
     States.loadAll()
     if (DB.getValue("cookie_store") != null)
         CCookiesStorage.loadFromJsonString(DB.getValue("cookie_store")!!)
