@@ -189,7 +189,7 @@ fun logOut() {
 
 class MergeStream(vararg val streams: OutputStream) : OutputStream() {
 
-    override fun write(b: kotlin.Int) {
+    override fun write(b: Int) {
         streams.forEach { it.write(b) }
     }
 
@@ -201,7 +201,7 @@ fun main() {
     val outOut = File("out.txt").outputStream()
     val out = PrintStream(MergeStream(outOut,System.out))
     System.setErr(err)
-    System.setErr(out)
+    System.setOut(out)
     States.loadAll()
     if (DB.getValue("cookie_store") != null)
         CCookiesStorage.loadFromJsonString(DB.getValue("cookie_store")!!)
